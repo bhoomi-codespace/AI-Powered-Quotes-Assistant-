@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-powered Quotes Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --card-glass: rgba(15, 15, 15, 0.75);
+            --neon-blue: #6e7ff3;
+            --accent-purple: #9d50bb;
+            --text-main: #e0e0e0;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Space Grotesk', sans-serif;
+            background: var(--bg-dark);
+            background-image: radial-gradient(circle at 10% 20%, rgba(110, 127, 243, 0.08) 0%, transparent 40%);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--card-glass);
+            backdrop-filter: blur(40px);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            padding: 40px 20px;
+        }
+
+        .sidebar h2 { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 3px; color: #666; margin-bottom: 40px; }
+        .topic-link { padding: 15px; margin-bottom: 8px; border-radius: 12px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; }
+        .topic-link:hover { background: rgba(255,255,255,0.05); color: var(--neon-blue); }
+
+        /* Main Chat Workspace */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 20px 60px;
+        }
+
+        #chat-window {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            padding: 40px 0;
+            scrollbar-width: none;
+        }
+
+        /* Message Bubbles */
+        .message { max-width: 70%; padding: 18px 24px; border-radius: 20px; font-size: 1.05rem; line-height: 1.6; animation: slideUp 0.4s ease; }
+        .user-msg { align-self: flex-end; background: linear-gradient(135deg, var(--neon-blue), var(--accent-purple)); color: white; border-bottom-right-radius: 4px; }
+        .bot-msg { align-self: flex-start; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-bottom-left-radius: 4px; }
+
+        /* Input Bar */
+        .input-area {
+            padding: 30px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .input-wrapper {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            padding: 8px 25px;
+            transition: 0.3s;
+        }
+
+        .input-wrapper:focus-within { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(110, 127, 243, 0.2); }
+
+        input { flex: 1; background: transparent; border: none; color: white; font-size: 1rem; outline: none; padding: 12px; }
+        .send-btn { background: var(--neon-blue); border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; color: white; transition: 0.3s; }
+        .send-btn:hover { transform: scale(1.1); }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Discovery</h2>
+        <div class="topic-link" onclick="sendTopic('Success')"><span>⚡</span> Success</div>
+        <div class="topic-link" onclick="sendTopic('Discipline')"><span>🛡️</span> Discipline</div>
+        <div class="topic-link" onclick="sendTopic('Life')"><span>🌱</span> Life</div>
+        <div class="topic-link" onclick="sendTopic('Leadership')"><span>👑</span> Leadership</div>
+        <div class="topic-link" onclick="sendTopic('Hardwork')"><span>🔨</span> Hardwork</div>
+    </div>
+
+    <div class="chat-container">
+        <div id="chat-window">
+            <div class="message bot-msg">Hello User! I'm your AI-powered Quotes Assistant. I am knowledgeable in a variety of topics. What are you thinking about today?</div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="user-input" placeholder="Ask for wisdom..." onkeypress="if(event.key==='Enter') send()">
+                <button class="send-btn" onclick="send()">→</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function send() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            if(!message) return;
+            
+            addMessage(message, 'user-msg');
+            input.value = '';
+            await fetchResponse(message);
+        }
+
+        async function sendTopic(topic) {
+            const text = `Give me a quote on ${topic}`;
+            addMessage(text, 'user-msg');
+            await fetchResponse(text);
+        }
+
+        function addMessage(text, type) {
+            const window = document.getElementById('chat-window');
+            window.innerHTML += `<div class="message ${type}">${text}</div>`;
+            window.scrollTop = window.scrollHeight;
+        }
+
+        async function fetchResponse(message) {
+            try {
+                const response = await fetch('http://localhost:5005/webhooks/rest/webhook', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({sender: "harsh_dev", message: message})
+                });
+                const data = await response.json();
+                data.forEach(m => addMessage(m.text, 'bot-msg'));
+            } catch (e) {
+                addMessage("Connection to the AI brain lost. Check your terminals.", 'bot-msg');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -142,7 +142,8 @@ This server manages NLU processing and API communication.
 
 powershell
 rasa run --enable-api --cors "*"
-## 3. Launch the Web Interface
+
+3. Launch the Web Interface
 
 Open the following file in a web browser:
 

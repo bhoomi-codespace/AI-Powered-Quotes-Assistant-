@@ -1,0 +1,5 @@
+# This file contains the different endpoints your bot can use.
+
+# The action_endpoint tells Rasa where your custom Python code (actions.py) is running.
+action_endpoint:
+  url: "http://localhost:5055/webhook"

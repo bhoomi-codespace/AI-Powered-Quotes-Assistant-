@@ -1,0 +1,12 @@
+version: "3.1"
+
+rules:
+  - rule: Say hello when user greets
+    steps:
+    - intent: greet
+    - action: utter_greet
+
+  - rule: Provide quote whenever requested
+    steps:
+    - intent: request_quote
+    - action: action_provide_quote

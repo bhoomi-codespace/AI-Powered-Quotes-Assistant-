@@ -1,0 +1,14 @@
+version: "3.1"
+
+stories:
+- story: greet and provide quote
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: request_quote
+  - action: action_provide_quote
+
+- story: direct quote request
+  steps:
+  - intent: request_quote
+  - action: action_provide_quote

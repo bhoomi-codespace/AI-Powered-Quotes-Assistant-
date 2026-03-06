@@ -1,0 +1,18 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hi
+    - hello
+    - hey
+    - good morning
+
+- intent: request_quote
+  examples: |
+    - give me a quote on [success](topic)
+    - i need motivation for [discipline](topic)
+    - tell me something about [leadership](topic)
+    - hey give me a quote on [life](topic)
+    - i want to hear about [courage](topic)
+    - can you show me a [hardwork](topic) quote

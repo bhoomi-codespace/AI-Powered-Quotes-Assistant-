@@ -1,0 +1,26 @@
+version: "3.1"
+
+intents:
+  - greet
+  - request_quote
+  - goodbye
+
+entities:
+  - topic
+
+slots:
+  topic:
+    type: text
+    influence_conversation: true
+    mappings:
+      - type: from_entity
+        entity: topic
+
+responses:
+  utter_greet:
+    - text: "Hello! What's in your mind?"
+  utter_goodbye:
+    - text: "Goodbye! Stay motivated."
+
+actions:
+  - action_provide_quote
